@@ -2,10 +2,35 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin, Clock } from "lucide-react";
 
 export default function Home() {
+  const [cmsData, setCmsData] = useState({
+    heroTitle: "Elevating culinary standards.",
+    heroSubtitle: "A highly curated dining experience focusing on seasonal ingredients, precision, and modern aesthetics.",
+    heroButton: "Book your experience",
+    heroImage: "/restaurant_hero.png",
+    exploreMenuTitle: "Explore the menu",
+    exploreMenuDesc: "Discover our seasonal ingredients and culinary mastery.",
+    exploreMenuImage: "/restaurant_food_1.png"
+  });
+
+  useEffect(() => {
+    fetch("/api/cms")
+      .then(res => res.json())
+      .then(data => {
+        if(data && !data.error) {
+          setCmsData({
+            ...cmsData,
+            ...data
+          });
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black overflow-x-hidden">
       
@@ -26,9 +51,8 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
           className="text-5xl md:text-8xl font-bold tracking-tighter mb-6 max-w-5xl"
-        >
-          Elevating culinary <br className="hidden md:block"/> standards.
-        </motion.h1>
+          dangerouslySetInnerHTML={{ __html: cmsData.heroTitle.replace('\n', '<br/>') }}
+        />
 
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -36,7 +60,7 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           className="text-lg md:text-xl text-gray-400 max-w-2xl mb-10"
         >
-          A highly curated dining experience focusing on seasonal ingredients, precision, and modern aesthetics.
+          {cmsData.heroSubtitle}
         </motion.p>
 
         <motion.div
@@ -49,7 +73,7 @@ export default function Home() {
             className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-full font-semibold text-lg overflow-hidden transition-transform hover:scale-105"
           >
             <span className="relative z-10 flex items-center gap-2">
-              Book your experience <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              {cmsData.heroButton} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </span>
           </Link>
         </motion.div>
@@ -67,7 +91,7 @@ export default function Home() {
             className="md:col-span-1 row-span-1 relative rounded-[2rem] overflow-hidden group"
           >
             <Image 
-              src="/restaurant_hero.png" 
+              src={cmsData.heroImage} 
               alt="Restaurant Atmosphere" 
               fill 
               className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -177,7 +201,7 @@ export default function Home() {
           className="mt-4 w-full rounded-[2rem] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between group cursor-pointer relative overflow-hidden min-h-[200px]"
         >
           <Image 
-            src="/restaurant_food_1.png" 
+            src={cmsData.exploreMenuImage} 
             alt="Explore our menu" 
             fill 
             className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -185,8 +209,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors duration-500 z-0" />
           
           <div className="text-center md:text-left mb-6 md:mb-0 z-10">
-            <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 text-white">Explore the menu</h3>
-            <p className="text-gray-300 md:text-lg max-w-xl">Discover our seasonal ingredients and culinary mastery.</p>
+            <h3 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 text-white">{cmsData.exploreMenuTitle}</h3>
+            <p className="text-gray-300 md:text-lg max-w-xl">{cmsData.exploreMenuDesc}</p>
           </div>
           <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform z-10 shrink-0 shadow-xl">
             <ArrowRight className="text-black" size={24} />
